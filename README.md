@@ -40,3 +40,13 @@ Some features may still be under development. This repository will be updated as
 ## 🎯 Goal
 
 To explore how affordable IoT technology can help improve water-supply monitoring and management in rural communities.
+## 📸 Project Screenshots
+
+### Sensor Node
+![Sensor Node](screenshots/sensor node.png)
+
+### Gateway
+![Gateway](screenshots/gateway.png)
+
+### Website Dashboard
+![Dashboard](screenshots/dashboard.png)
