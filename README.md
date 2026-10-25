@@ -43,7 +43,7 @@ To explore how affordable IoT technology can help improve water-supply monitorin
 ## 📸 Project Screenshots
 
 ### Sensor Node
-![Sensor Node](images/sensor_node.png)
+![Sensor Node](images/sensor-node.png)
 
 ### Gateway
 ![Gateway](images/gateway.png)
