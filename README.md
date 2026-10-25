@@ -50,3 +50,9 @@ To explore how affordable IoT technology can help improve water-supply monitorin
 
 ### Website Dashboard
 ![Dashboard](images/dashboard.png)
+
+
+## 🔗 Wokwi Simulation
+
+[View Sensor Node Simulation](https://wokwi.com/projects/476318022500616193)
+[View Gateway Simulation](https://wokwi.com/projects/476320556889458689)
