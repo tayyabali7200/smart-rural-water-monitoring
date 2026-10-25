@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rural Water Monitoring System</title>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+/* HEADER */
+
+.header {
+    background: #0f2747;
+    color: white;
+    padding: 18px 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo {
+    width: 45px;
+    height: 45px;
+    background: #1687d9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+}
+
+.title h1 {
+    font-size: 21px;
+}
+
+.title p {
+    font-size: 12px;
+    color: #b8c7d9;
+    margin-top: 3px;
+}
+
+.connection {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255,255,255,0.1);
+    padding: 9px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #777;
+}
+
+/* MAIN */
+
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 30px;
+}
+
+/* TOP BAR */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-title h2 {
+    font-size: 24px;
+}
+
+.page-title p {
+    color: #718096;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.village {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* CARDS */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e4e9f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title {
+    font-size: 13px;
+    color: #718096;
+}
+
+.icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: #edf5fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+.value {
+    font-size: 29px;
+    font-weight: bold;
+    margin-top: 16px;
+}
+
+.unit {
+    font-size: 13px;
+    color: #718096;
+    margin-left: 4px;
+}
+
+.card-status {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* STATUS COLORS */
+
+.good {
+    color: #159447;
+}
+
+.warning {
+    color: #d58b00;
+}
+
+.danger {
+    color: #d73737;
+}
+
+.neutral {
+    color: #718096;
+}
+
+/* SECTION */
+
+.section {
+    margin-top: 25px;
+}
+
+.section-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 13px;
+}
+
+/* STATUS GRID */
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.status-card {
+    background: white;
+    border: 1px solid #e4e9f0;
+    border-radius: 11px;
+    padding: 18px;
+}
+
+.status-label {
+    font-size: 12px;
+    color: #718096;
+    margin-bottom: 9px;
+}
+
+.status-value {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* ALERT */
+
+.alert {
+    margin-top: 25px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e4e9f0;
+    padding: 20px;
+}
+
+.alert-normal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #159447;
+}
+
+.alert-danger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #d73737;
+}
+
+.alert-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edf9f1;
+    font-size: 18px;
+}
+
+/* FOOTER */
+
+.footer {
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    color: #718096;
+    font-size: 12px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .header {
+        padding: 15px;
+    }
+
+    .container {
+        padding: 18px;
+    }
+
+    .cards,
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="header">
+
+    <div class="logo-section">
+
+        <div class="logo">
+            💧
+        </div>
+
+        <div class="title">
+            <h1>Rural Water Monitoring</h1>
+            <p>IoT Based Water Service Management System</p>
+        </div>
+
+    </div>
+
+    <div class="connection">
+        <span class="status-dot" id="connectionDot"></span>
+        <span id="connectionText">Connecting...</span>
+    </div>
+
+</header>
+
+
+<main class="container">
+
+<!-- TOP -->
+
+<div class="topbar">
+
+    <div class="page-title">
+        <h2>Water Supply Dashboard</h2>
+        <p>Real-time monitoring of village water infrastructure</p>
+    </div>
+
+    <div class="village">
+        <b>Village:</b> VILLAGE_01
+    </div>
+
+</div>
+
+
+<!-- SENSOR CARDS -->
+
+<div class="cards">
+
+    <!-- FLOW -->
+
+    <div class="card">
+
+        <div class="card-top">
+
+            <span class="card-title">
+                CURRENT FLOW
+            </span>
+
+            <div class="icon">💧</div>
+
+        </div>
+
+        <div class="value">
+            <span id="flow">--</span>
+            <span class="unit">L/min</span>
+        </div>
+
+        <div class="card-status" id="flowCardStatus">
+            Waiting for data
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL WATER -->
+
+    <div class="card">
+
+        <div class="card-top">
+
+            <span class="card-title">
+                TOTAL WATER
+            </span>
+
+            <div class="icon">🚰</div>
+
+        </div>
+
+        <div class="value">
+            <span id="total">--</span>
+            <span class="unit">L</span>
+        </div>
+
+        <div class="card-status neutral">
+            Cumulative supply
+        </div>
+
+    </div>
+
+
+    <!-- PRESSURE -->
+
+    <div class="card">
+
+        <div class="card-top">
+
+            <span class="card-title">
+                WATER PRESSURE
+            </span>
+
+            <div class="icon">📊</div>
+
+        </div>
+
+        <div class="value">
+            <span id="pressure">--</span>
+            <span class="unit">bar</span>
+        </div>
+
+        <div class="card-status" id="pressureCardStatus">
+            Waiting for data
+        </div>
+
+    </div>
+
+
+    <!-- TDS -->
+
+    <div class="card">
+
+        <div class="card-top">
+
+            <span class="card-title">
+                WATER QUALITY
+            </span>
+
+            <div class="icon">🧪</div>
+
+        </div>
+
+        <div class="value">
+            <span id="tds">--</span>
+            <span class="unit">ppm</span>
+        </div>
+
+        <div class="card-status" id="qualityCardStatus">
+            Waiting for data
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SYSTEM STATUS -->
+
+<div class="section">
+
+    <div class="section-title">
+        System Status
+    </div>
+
+    <div class="status-grid">
+
+        <div class="status-card">
+
+            <div class="status-label">
+                FLOW STATUS
+            </div>
+
+            <div class="status-value" id="flowStatus">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-label">
+                PRESSURE STATUS
+            </div>
+
+            <div class="status-value" id="pressureStatus">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-label">
+                WATER QUALITY
+            </div>
+
+            <div class="status-value" id="qualityStatus">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <div class="status-label">
+                LEAKAGE
+            </div>
+
+            <div class="status-value" id="leakage">
+                --
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ALERT -->
+
+<div class="alert">
+
+    <div id="alertBox" class="alert-normal">
+
+        <div class="alert-icon">
+            ✓
+        </div>
+
+        <div>
+
+            <b id="alertTitle">
+                System Normal
+            </b>
+
+            <div style="font-size:12px;margin-top:3px;color:#718096"
+                 id="alertMessage">
+
+                No active water supply alerts.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+    <span>
+        IoT Rural Water Monitoring System
+    </span>
+
+    <span>
+        Last Update: <b id="lastUpdate">--</b>
+    </span>
+
+</div>
+
+</main>
+
+
+<script>
+
+/* MQTT CONFIG */
+
+const MQTT_URL = "ws://test.mosquitto.org:8080/mqtt";
+
+const MQTT_TOPIC =
+    "ruralwater/VILLAGE_01/dashboard";
+
+
+let brokerConnected = false;
+
+let lastDataReceived = 0;
+
+
+/* CONNECT */
+
+const client = mqtt.connect(MQTT_URL, {
+
+    reconnectPeriod: 5000,
+
+    connectTimeout: 10000
+
+});
+
+
+/* CONNECTED */
+
+client.on("connect", function() {
+
+    brokerConnected = true;
+
+    updateConnection();
+
+    client.subscribe(MQTT_TOPIC, function(err) {
+
+        if (err) {
+
+            console.error("Subscribe error:", err);
+
+        } else {
+
+            console.log("Subscribed to:", MQTT_TOPIC);
+
+        }
+
+    });
+
+});
+
+
+/* MESSAGE */
+
+client.on("message", function(topic, message) {
+
+    try {
+
+        const data = JSON.parse(message.toString());
+
+        console.log("Received:", data);
+
+        lastDataReceived = Date.now();
+
+        updateDashboard(data);
+
+    }
+
+    catch(error) {
+
+        console.error("Invalid data:", error);
+
+    }
+
+});
+
+
+/* CONNECTION EVENTS */
+
+client.on("close", function() {
+
+    brokerConnected = false;
+
+    updateConnection();
+
+});
+
+
+client.on("offline", function() {
+
+    brokerConnected = false;
+
+    updateConnection();
+
+});
+
+
+client.on("error", function(error) {
+
+    console.error("MQTT Error:", error);
+
+    brokerConnected = false;
+
+    updateConnection();
+
+});
+
+
+/* CONNECTION STATUS */
+
+function updateConnection() {
+
+    const dot =
+        document.getElementById("connectionDot");
+
+    const text =
+        document.getElementById("connectionText");
+
+
+    if (!brokerConnected) {
+
+        dot.style.background = "#d73737";
+
+        text.innerText = "Broker Offline";
+
+    }
+
+    else if (!lastDataReceived) {
+
+        dot.style.background = "#d58b00";
+
+        text.innerText = "Waiting for Gateway";
+
+    }
+
+    else if (Date.now() - lastDataReceived > 15000) {
+
+        dot.style.background = "#d73737";
+
+        text.innerText = "Gateway Offline";
+
+    }
+
+    else {
+
+        dot.style.background = "#20a05a";
+
+        text.innerText = "Gateway Live";
+
+    }
+
+}
+
+
+/* UPDATE DASHBOARD */
+
+function updateDashboard(data) {
+
+    document.getElementById("flow").innerText =
+        data.flow ?? "--";
+
+    document.getElementById("total").innerText =
+        data.totalLiters ?? "--";
+
+    document.getElementById("pressure").innerText =
+        data.pressure ?? "--";
+
+    document.getElementById("tds").innerText =
+        data.tds ?? "--";
+
+
+    document.getElementById("flowStatus").innerText =
+        data.flowStatus ?? "--";
+
+    document.getElementById("pressureStatus").innerText =
+        data.pressureStatus ?? "--";
+
+    document.getElementById("qualityStatus").innerText =
+        data.qualityStatus ?? "--";
+
+
+    /* FLOW */
+
+    const flowStatus =
+        document.getElementById("flowCardStatus");
+
+    if (data.flowStatus === "NORMAL") {
+
+        flowStatus.innerText = "Supply normal";
+        flowStatus.className = "card-status good";
+
+    }
+
+    else if (data.flowStatus === "LOW_FLOW") {
+
+        flowStatus.innerText = "Low water flow";
+        flowStatus.className = "card-status warning";
+
+    }
+
+    else {
+
+        flowStatus.innerText = "No water flow";
+        flowStatus.className = "card-status danger";
+
+    }
+
+
+    /* PRESSURE */
+
+    const pressureStatus =
+        document.getElementById("pressureCardStatus");
+
+    if (data.pressureStatus === "NORMAL") {
+
+        pressureStatus.innerText = "Pressure normal";
+        pressureStatus.className = "card-status good";
+
+    }
+
+    else {
+
+        pressureStatus.innerText =
+            "Pressure " +
+            String(data.pressureStatus).toLowerCase();
+
+        pressureStatus.className =
+            "card-status warning";
+
+    }
+
+
+    /* QUALITY */
+
+    const qualityStatus =
+        document.getElementById("qualityCardStatus");
+
+    if (data.qualityStatus === "GOOD") {
+
+        qualityStatus.innerText =
+            "Water quality good";
+
+        qualityStatus.className =
+            "card-status good";
+
+    }
+
+    else if (data.qualityStatus === "WARNING") {
+
+        qualityStatus.innerText =
+            "Quality warning";
+
+        qualityStatus.className =
+            "card-status warning";
+
+    }
+
+    else {
+
+        qualityStatus.innerText =
+            "Poor water quality";
+
+        qualityStatus.className =
+            "card-status danger";
+
+    }
+
+
+    /* LEAKAGE */
+
+    const leakage =
+        document.getElementById("leakage");
+
+    const alertBox =
+        document.getElementById("alertBox");
+
+    const alertTitle =
+        document.getElementById("alertTitle");
+
+    const alertMessage =
+        document.getElementById("alertMessage");
+
+
+    if (data.leakage === 1) {
+
+        leakage.innerText = "ALERT";
+
+        leakage.className =
+            "status-value danger";
+
+
+        alertBox.className =
+            "alert-danger";
+
+
+        alertBox.querySelector(".alert-icon")
+            .style.background = "#fff0f0";
+
+
+        alertBox.querySelector(".alert-icon")
+            .innerText = "!";
+
+
+        alertTitle.innerText =
+            "Water Leakage Detected";
+
+
+        alertMessage.innerText =
+            "Immediate inspection is required.";
+
+    }
+
+    else {
+
+        leakage.innerText = "NORMAL";
+
+        leakage.className =
+            "status-value good";
+
+
+        alertBox.className =
+            "alert-normal";
+
+
+        alertBox.querySelector(".alert-icon")
+            .style.background = "#edf9f1";
+
+
+        alertBox.querySelector(".alert-icon")
+            .innerText = "✓";
+
+
+        alertTitle.innerText =
+            "System Normal";
+
+
+        alertMessage.innerText =
+            "No active water supply alerts.";
+
+    }
+
+
+    /* TIME */
+
+    document.getElementById("lastUpdate")
+        .innerText =
+        new Date().toLocaleTimeString();
+
+}
+
+
+/* CHECK EVERY SECOND */
+
+setInterval(function() {
+
+    updateConnection();
+
+}, 1000);
+
+</script>
+
+</body>
+</html>
