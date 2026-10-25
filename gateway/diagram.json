@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "author": "Rural Water Monitor",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_green",
+      "top": 80,
+      "left": 260,
+      "attrs": { "color": "green" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 80,
+      "left": 310,
+      "attrs": { "color": "red" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "r_green",
+      "top": 130,
+      "left": 260,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "r_red",
+      "top": 130,
+      "left": 310,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 220,
+      "left": 280,
+      "attrs": { "volume": "0.2" }
+    }
+  ],
+
+  "connections": [
+
+    ["esp:TX0", "$serialMonitor:RX", "", []],
+    ["esp:RX0", "$serialMonitor:TX", "", []],
+
+    ["esp:D26", "led_green:A", "green", []],
+    ["led_green:C", "r_green:1", "black", []],
+    ["r_green:2", "esp:GND.1", "black", []],
+
+    ["esp:D27", "led_red:A", "red", []],
+    ["led_red:C", "r_red:1", "black", []],
+    ["r_red:2", "esp:GND.1", "black", []],
+
+    ["esp:D14", "buzzer:1", "green", []],
+    ["buzzer:2", "esp:GND.2", "black", []]
+  ]
+}
