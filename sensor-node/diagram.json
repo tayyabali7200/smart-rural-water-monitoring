@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "author": "Rural Water Monitor",
+  "editor": "wokwi",
+
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_flow",
+      "top": -87.7,
+      "left": 259,
+      "attrs": { "value": "50" }
+    },
+
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_pressure",
+      "top": -97.3,
+      "left": 374.2,
+      "attrs": { "value": "50" }
+    },
+
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_tds",
+      "top": -68.5,
+      "left": 499,
+      "attrs": { "value": "50" }
+    },
+
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_leak",
+      "top": 220,
+      "left": 260,
+      "attrs": { "color": "red" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_green",
+      "top": 100,
+      "left": 400,
+      "attrs": { "color": "green" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_yellow",
+      "top": 100,
+      "left": 440,
+      "attrs": { "color": "yellow" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 100,
+      "left": 480,
+      "attrs": { "color": "red" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "r_green",
+      "top": 140,
+      "left": 400,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "r_yellow",
+      "top": 140,
+      "left": 440,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-resistor",
+      "id": "r_red",
+      "top": 140,
+      "left": 480,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 213.6,
+      "left": 491.4,
+      "attrs": { "volume": "0.2" }
+    }
+  ],
+
+  "connections": [
+
+    ["esp:TX0", "$serialMonitor:RX", "", []],
+    ["esp:RX0", "$serialMonitor:TX", "", []],
+
+    ["esp:D34", "pot_flow:SIG", "green", []],
+    ["pot_flow:VCC", "esp:3V3", "red", []],
+    ["pot_flow:GND", "esp:GND.1", "black", []],
+
+    ["esp:D35", "pot_pressure:SIG", "green", []],
+    ["pot_pressure:VCC", "esp:3V3", "red", []],
+    ["pot_pressure:GND", "esp:GND.1", "black", []],
+
+    ["esp:D32", "pot_tds:SIG", "green", []],
+    ["pot_tds:VCC", "esp:3V3", "red", []],
+    ["pot_tds:GND", "esp:GND.1", "black", []],
+
+    ["esp:D25", "btn_leak:1.l", "yellow", []],
+    ["btn_leak:2.l", "esp:GND.2", "black", []],
+
+    ["esp:D14", "led_green:A", "green", []],
+    ["led_green:C", "r_green:1", "black", []],
+    ["r_green:2", "esp:GND.2", "black", []],
+
+    ["esp:D27", "led_yellow:A", "yellow", []],
+    ["led_yellow:C", "r_yellow:1", "black", []],
+    ["r_yellow:2", "esp:GND.2", "black", []],
+
+    ["esp:D26", "led_red:A", "red", []],
+    ["led_red:C", "r_red:1", "black", []],
+    ["r_red:2", "esp:GND.2", "black", []],
+
+    ["esp:D13", "buzzer:1", "green", []],
+    ["buzzer:2", "esp:GND.2", "black", []]
+  ],
+
+  "dependencies": {}
+}
